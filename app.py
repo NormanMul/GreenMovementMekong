@@ -31,13 +31,12 @@ api_key = st.secrets["groq"]["api_key"]
 
 # Manual data creation for Mekong River
 mekong_points = [
-    [109.3359, 34.2044], # Example points, replace with actual coordinates
-    [107.3359, 32.2044],
-    # Add more points to accurately represent the Mekong River
+    [102.584932, 14.235004], # Near Phnom Penh
+    [105.690450, 18.695265]  # Up to Vientiane
 ]
 mekong_line = LineString(mekong_points)
 mekong_gdf = gpd.GeoDataFrame({'geometry': [mekong_line]}, crs="EPSG:4326")
-highlight_point = gpd.GeoDataFrame({'geometry': [Point(108.3359, 33.2044)]}, crs="EPSG:4326")  # Adjust coordinates for the actual highlight spot
+highlight_point = gpd.GeoDataFrame({'geometry': [Point(102.6006, 17.9667)]}, crs="EPSG:4326")  # Vientiane
 
 # Convert GeoDataFrames to json for PyDeck
 mekong_json = mekong_gdf.__geo_interface__
@@ -59,14 +58,14 @@ scatter_layer = pdk.Layer(
     data=highlight_json,
     get_position="coordinates",
     get_color=[255, 0, 0, 160],  # Red color
-    get_radius=50000,  # Adjust size as needed
+    get_radius=150000,  # Adjusted for better visibility
     pickable=True
 )
 
 view_state = pdk.ViewState(
-    latitude=33.2044,  # Adjust based on actual data
-    longitude=108.3359,  # Adjust based on actual data
-    zoom=4,
+    latitude=16.047079,  # Centered on Laos
+    longitude=105.870030,  # Centered on Laos
+    zoom=5,
     pitch=50,
 )
 st.pydeck_chart(pdk.Deck(
