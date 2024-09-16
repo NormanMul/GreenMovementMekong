@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 import geopandas as gpd
 import pydeck as pdk
 from shapely.geometry import LineString, Point
@@ -32,31 +31,36 @@ api_key = st.secrets["groq"]["api_key"]
 
 # Manual data creation for Mekong River
 mekong_points = [
-    (34.2044, 109.3359), # Example points, replace with actual coordinates
-    (32.2044, 107.3359),
+    [109.3359, 34.2044], # Example points, replace with actual coordinates
+    [107.3359, 32.2044],
     # Add more points to accurately represent the Mekong River
 ]
 mekong_line = LineString(mekong_points)
 mekong_gdf = gpd.GeoDataFrame({'geometry': [mekong_line]}, crs="EPSG:4326")
-highlight_point = gpd.GeoDataFrame({'geometry': [Point(33.2044, 108.3359)]}, crs="EPSG:4326")  # Adjust coordinates for the actual highlight spot
+highlight_point = gpd.GeoDataFrame({'geometry': [Point(108.3359, 33.2044)]}, crs="EPSG:4326")  # Adjust coordinates for the actual highlight spot
+
+# Convert GeoDataFrames to json for PyDeck
+mekong_json = mekong_gdf.__geo_interface__
+highlight_json = highlight_point.__geo_interface__
 
 # Display the map with the Mekong River
 st.subheader("Mekong River Map")
 path_layer = pdk.Layer(
     type="PathLayer",
-    data=mekong_gdf,
-    get_path="geometry.coordinates",
+    data=mekong_json,
+    get_path="coordinates",
     width_scale=20,
-    get_color="[200, 30, 0, 160]",
+    get_color=[200, 30, 0, 160],
     get_width=5,
     pickable=True
 )
 scatter_layer = pdk.Layer(
     "ScatterplotLayer",
-    highlight_point,
-    get_position="geometry.coordinates",
-    get_color="[255, 0, 0, 160]",  # Red color
+    data=highlight_json,
+    get_position="coordinates",
+    get_color=[255, 0, 0, 160],  # Red color
     get_radius=50000,  # Adjust size as needed
+    pickable=True
 )
 
 view_state = pdk.ViewState(
