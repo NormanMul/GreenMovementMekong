@@ -83,7 +83,7 @@ st.image(river_image, caption="Mekong River", use_column_width=True)
 
 # Function to handle response generation
 def generate_response(prompt):
-    from groq import Groq
+    from groq import Groq  # Assuming Groq is a correct import
     client = Groq(api_key=api_key)
     try:
         response = client.chat.completions.create(
@@ -94,3 +94,6 @@ def generate_response(prompt):
             ],
             temperature=0.7
         )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        st.error(f"An error occurred
