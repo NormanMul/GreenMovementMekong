@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import geopandas as gpd
 import pydeck as pdk
-from shapely.geometry import LineString
+from shapely.geometry import LineString, Point
 
 # Set Streamlit page configuration
 st.set_page_config(page_title="Greenmovement", layout="centered")
@@ -38,10 +38,11 @@ mekong_points = [
 ]
 mekong_line = LineString(mekong_points)
 mekong_gdf = gpd.GeoDataFrame({'geometry': [mekong_line]}, crs="EPSG:4326")
+highlight_point = gpd.GeoDataFrame({'geometry': [Point(33.2044, 108.3359)]}, crs="EPSG:4326")  # Adjust coordinates for the actual highlight spot
 
 # Display the map with the Mekong River
 st.subheader("Mekong River Map")
-layer = pdk.Layer(
+path_layer = pdk.Layer(
     type="PathLayer",
     data=mekong_gdf,
     get_path="geometry.coordinates",
@@ -50,6 +51,14 @@ layer = pdk.Layer(
     get_width=5,
     pickable=True
 )
+scatter_layer = pdk.Layer(
+    "ScatterplotLayer",
+    highlight_point,
+    get_position="geometry.coordinates",
+    get_color="[255, 0, 0, 160]",  # Red color
+    get_radius=50000,  # Adjust size as needed
+)
+
 view_state = pdk.ViewState(
     latitude=33.2044,  # Adjust based on actual data
     longitude=108.3359,  # Adjust based on actual data
@@ -57,9 +66,13 @@ view_state = pdk.ViewState(
     pitch=50,
 )
 st.pydeck_chart(pdk.Deck(
-    layers=[layer],
+    layers=[path_layer, scatter_layer],
     initial_view_state=view_state
 ))
+
+# Legend
+st.write("### Legend")
+st.write("🔴 - Specific Area of Interest on the Mekong River")
 
 # Function to handle response generation
 def generate_response(prompt):
