@@ -96,4 +96,15 @@ def generate_response(prompt):
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
-        st.error(f"An error occurred
+        st.error(f"An error occurred: {e}")
+        return "I'm sorry, I couldn't generate a response."
+
+# Chatbox functionality
+question = st.text_input("Ask a question or make a request:")
+if question:
+    answer = generate_response(question)
+    st.session_state.responses.append({"question": question, "answer": answer})
+
+for entry in reversed(st.session_state.responses):
+    st.write(f"**Q:** {entry['question']}\n**A:** {entry['answer']}")
+    st.write("---")
